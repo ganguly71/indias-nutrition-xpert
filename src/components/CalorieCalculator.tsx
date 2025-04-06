@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useToast } from "@/components/ui/use-toast";
 import { calculateCalorieNeeds } from '@/utils/calculations';
@@ -14,7 +13,8 @@ import {
   XAxis, 
   YAxis, 
   CartesianGrid,
-  Tooltip
+  Tooltip,
+  TooltipProps
 } from 'recharts';
 
 interface CalorieCalculatorProps {
@@ -45,7 +45,6 @@ const CalorieCalculator = ({
   
   const { toast } = useToast();
   
-  // Calculate calorie needs
   const calculateNeeds = () => {
     const data = calculateCalorieNeeds(age, weight, height, gender === "male", occupation);
     setCalorieData(data);
@@ -56,19 +55,16 @@ const CalorieCalculator = ({
     });
   };
   
-  // Initial calculation
   useEffect(() => {
     calculateNeeds();
   }, []);
   
-  // Chart data for macronutrients
   const macroData = calorieData ? [
     { name: "Protein", value: calorieData.proteinNeeds * 4, color: "#F87171" },
     { name: "Carbs", value: calorieData.carbNeeds * 4, color: "#60A5FA" },
     { name: "Fat", value: calorieData.fatNeeds * 9, color: "#FBBF24" },
   ] : [];
   
-  // Sample food suggestions
   const getFoodSuggestions = () => {
     if (!calorieData) return [];
     
@@ -88,7 +84,6 @@ const CalorieCalculator = ({
     return suggestions[dietPreference];
   };
   
-  // Sample meal plan based on calorie needs
   const getMealPlan = () => {
     if (!calorieData) return null;
     
@@ -121,7 +116,6 @@ const CalorieCalculator = ({
       <h2 className="text-2xl font-bold text-xd-green mb-6">Calorie & Nutrition Calculator</h2>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-        {/* Input Form */}
         <div className="bg-gray-50 p-6 rounded-lg">
           <h3 className="text-lg font-medium text-gray-700 mb-4">Your Information</h3>
           
@@ -241,7 +235,6 @@ const CalorieCalculator = ({
           </div>
         </div>
         
-        {/* Results */}
         <div>
           {calorieData && (
             <>
@@ -278,7 +271,7 @@ const CalorieCalculator = ({
                         ))}
                       </Pie>
                       <Legend />
-                      <Tooltip formatter={(value) => [`${Math.round(value)} kcal`]} />
+                      <Tooltip formatter={(value) => [`${Math.round(Number(value))} kcal`]} />
                     </PieChart>
                   </ResponsiveContainer>
                 </div>
@@ -303,7 +296,6 @@ const CalorieCalculator = ({
         </div>
       </div>
       
-      {/* Food Suggestions & Sample Meal Plan */}
       {calorieData && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div>
@@ -329,10 +321,10 @@ const CalorieCalculator = ({
           
           <div>
             <h3 className="text-xl font-semibold mb-4 text-xd-green">Sample Meal Plan</h3>
-            {getMealPlan() && Object.entries(getMealPlan()!).map(([mealTime, meal]) => (
+            {getMealPlan() && Object.entries(getMealPlan() || {}).map(([mealTime, meal]) => (
               <div key={mealTime} className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 mb-4">
                 <h4 className="font-medium capitalize">{mealTime.replace(/([A-Z])/g, ' $1')}</h4>
-                <p className="text-gray-700 mt-1">{meal}</p>
+                <p className="text-gray-700 mt-1">{meal as React.ReactNode}</p>
               </div>
             ))}
             
